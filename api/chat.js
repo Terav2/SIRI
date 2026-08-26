@@ -1,5 +1,3 @@
-Diff
-
 // Vercel Serverless Function — /api/chat
 // Keeps the OpenRouter API key secure on the server side
 
