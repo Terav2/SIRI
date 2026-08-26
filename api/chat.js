@@ -1,7 +1,21 @@
 // Vercel Serverless Function — /api/chat
 // Keeps the OpenRouter API key secure on the server side
 
+export const config = {
+  runtime: 'nodejs'
+};
+
 export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -24,7 +38,7 @@ export default async function handler(req, res) {
 
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'API key not configured on server' });
+      return res.status(500).json({ error: 'API key not configured on server. Please set OPENROUTER_API_KEY in Vercel environment variables.' });
     }
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -32,7 +46,7 @@ export default async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://siri-ai-assistant.vercel.app',
+        'HTTP-Referer': 'https://siri-lac-pi.vercel.app',
         'X-Title': 'Siri AI Assistant'
       },
       body: JSON.stringify({
@@ -44,9 +58,10 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenRouter API error:', errorText);
+      console.error('OpenRouter API error:', response.status, errorText);
       return res.status(response.status).json({
-        error: 'AI service temporarily unavailable'
+        error: 'AI service temporarily unavailable',
+        status: response.status
       });
     }
 
@@ -55,6 +70,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Serverless function error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
