@@ -1,3 +1,5 @@
+Diff
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,11 +27,12 @@
 
     /* ===== AMBIENT BG ===== */
     .ambient{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .ambient .orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.12;animation:drift 20s ease-in-out infinite}
-    .ambient .o1{width:400px;height:400px;background:var(--siri-purple);top:-150px;right:-100px}
-    .ambient .o2{width:300px;height:300px;background:var(--siri-blue);bottom:-80px;left:-60px;animation-delay:-7s}
-    .ambient .o3{width:250px;height:250px;background:var(--siri-pink);top:40%;left:30%;animation-delay:-14s}
-    @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.05)}66%{transform:translate(-20px,30px) scale(.95)}}
+    .ambient .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.18;animation:drift 20s ease-in-out infinite}
+    .ambient .o1{width:500px;height:500px;background:var(--siri-purple);top:-180px;right:-120px}
+    .ambient .o2{width:400px;height:400px;background:var(--siri-blue);bottom:-100px;left:-80px;animation-delay:-7s}
+    .ambient .o3{width:350px;height:350px;background:var(--siri-pink);top:35%;left:25%;animation-delay:-14s}
+    .ambient .o4{width:300px;height:300px;background:var(--siri-teal);top:60%;right:10%;animation-delay:-10s;opacity:.1}
+    @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.08)}66%{transform:translate(-20px,30px) scale(.92)}}
 
     /* ===== SIDEBAR (Desktop) ===== */
     .sidebar{width:var(--sidebar-w);height:100%;display:flex;flex-direction:column;background:rgba(0,0,0,0.5);backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);border-right:1px solid var(--glass-border);position:relative;z-index:20;overflow:hidden;flex-shrink:0;transition:transform .3s cubic-bezier(.4,0,.2,1)}
@@ -79,15 +82,19 @@
 
     /* Welcome */
     .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:20px;padding:20px}
-    .welcome-orb{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(100,210,255,.8),rgba(191,90,242,.6),rgba(255,55,95,.4),rgba(10,132,255,.2));animation:orb-breathe 4s ease-in-out infinite;box-shadow:0 0 60px rgba(191,90,242,.25),0 0 120px rgba(10,132,255,.1),inset 0 0 40px rgba(255,255,255,.1);position:relative}
-    .welcome-orb::before{content:'';position:absolute;top:15%;left:15%;width:70%;height:70%;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.25),transparent 60%)}
-    @keyframes orb-breathe{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.06);opacity:1}}
+    .welcome-orb{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(100,210,255,.9),rgba(191,90,242,.7),rgba(255,55,95,.5),rgba(10,132,255,.3));animation:orb-breathe 4s ease-in-out infinite;box-shadow:0 0 80px rgba(191,90,242,.35),0 0 160px rgba(10,132,255,.15),0 0 40px rgba(255,55,95,.1),inset 0 0 60px rgba(255,255,255,.15);position:relative;overflow:hidden}
+    .welcome-orb::before{content:'';position:absolute;top:8%;left:12%;width:75%;height:75%;border-radius:50%;background:radial-gradient(ellipse at 35% 35%,rgba(255,255,255,.35),transparent 55%);filter:blur(2px)}
+    .welcome-orb::after{content:'';position:absolute;bottom:10%;right:10%;width:40%;height:40%;border-radius:50%;background:radial-gradient(circle,rgba(100,210,255,.3),transparent 70%);animation:orb-inner 6s ease-in-out infinite;filter:blur(4px)}
+    @keyframes orb-inner{0%,100%{transform:translate(0,0)}50%{transform:translate(-5px,5px)}}
+    @keyframes orb-breathe{0%,100%{transform:scale(1);opacity:.9;filter:hue-rotate(0deg)}50%{transform:scale(1.08);opacity:1;filter:hue-rotate(15deg)}}
     .welcome h1{font-size:26px;font-weight:800;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.65));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .welcome .tagline{font-size:14px;color:var(--text-2);margin-top:-8px}
     .welcome .usp{font-size:12px;color:var(--siri-purple);font-weight:600;background:rgba(191,90,242,.1);padding:4px 14px;border-radius:20px;border:1px solid rgba(191,90,242,.2)}
     .suggestions{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;width:100%;max-width:520px}
-    .sug-card{padding:12px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(20px);cursor:pointer;transition:all .3s;text-align:left}
-    .sug-card:hover{background:var(--glass-heavy);border-color:rgba(255,255,255,.12);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+    .sug-card{padding:14px 16px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);text-align:left;position:relative;overflow:hidden}
+    .sug-card::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.05),transparent 50%);opacity:0;transition:opacity .3s}
+    .sug-card:hover{background:rgba(255,255,255,.06);border-color:rgba(191,90,242,.2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3),0 0 20px rgba(191,90,242,.08)}
+    .sug-card:hover::before{opacity:1}
     .sug-card:active{transform:scale(.97)}
     .sug-icon{font-size:20px;margin-bottom:6px}
     .sug-text{font-size:12px;color:var(--text-2);line-height:1.4}
@@ -102,8 +109,8 @@
     .msg-name{font-size:12px;font-weight:600;color:var(--text-2)}
     .msg-time{font-size:10px;color:var(--text-3)}
     .msg-bubble{padding:14px 18px;border-radius:20px;font-size:14px;line-height:1.65;max-width:88%;word-wrap:break-word}
-    .msg.user .msg-bubble{background:var(--msg-user);border:1px solid rgba(10,132,255,.15);margin-left:auto;border-bottom-right-radius:6px}
-    .msg.siri .msg-bubble{background:var(--msg-siri);border:1px solid var(--glass-border);backdrop-filter:blur(20px);border-bottom-left-radius:6px}
+    .msg.user .msg-bubble{background:linear-gradient(135deg,rgba(10,132,255,.12),rgba(10,132,255,.08));border:1px solid rgba(10,132,255,.12);margin-left:auto;border-bottom-right-radius:6px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+    .msg.siri .msg-bubble{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);border-bottom-left-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,.15)}
     .msg-bubble p{margin-bottom:8px}.msg-bubble p:last-child{margin-bottom:0}
     .msg-bubble code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;font-size:12px;font-family:'SF Mono','Fira Code',monospace}
     .msg-bubble pre{background:rgba(0,0,0,.4);padding:12px 16px;border-radius:10px;overflow-x:auto;margin:8px 0;font-size:12px;line-height:1.5}
@@ -127,8 +134,8 @@
     @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
 
     /* ===== ACTION WIDGETS (rendered in chat) ===== */
-    .action-widget{margin-top:12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--glass-border);overflow:hidden;max-width:380px}
-    .aw-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--glass-border);font-size:12px;font-weight:600;color:var(--text-2)}
+    .action-widget{margin-top:12px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);overflow:hidden;max-width:380px;backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);box-shadow:0 4px 24px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.05)}
+    .aw-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.01));border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;font-weight:600;color:var(--text-2)}
     .aw-header .aw-icon{font-size:16px}
     .aw-body{padding:16px}
 
@@ -214,8 +221,8 @@
 
     /* ===== INPUT AREA ===== */
     .input-area{padding:12px 16px 20px;backdrop-filter:blur(40px) saturate(180%);-webkit-backdrop-filter:blur(40px) saturate(180%);background:rgba(0,0,0,.4);border-top:1px solid var(--glass-border);position:relative;z-index:5}
-    .input-wrap{display:flex;align-items:flex-end;gap:8px;background:var(--glass-heavy);border:1px solid var(--glass-border);border-radius:24px;padding:5px 5px 5px 16px;transition:all .3s}
-    .input-wrap:focus-within{border-color:rgba(191,90,242,.35);box-shadow:0 0 0 3px rgba(191,90,242,.08)}
+    .input-wrap{display:flex;align-items:flex-end;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:26px;padding:5px 5px 5px 16px;transition:all .3s;backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);box-shadow:0 2px 16px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.04)}
+    .input-wrap:focus-within{border-color:rgba(191,90,242,.3);box-shadow:0 2px 16px rgba(0,0,0,.15),0 0 0 3px rgba(191,90,242,.08),inset 0 1px 0 rgba(255,255,255,.04)}
     .input-wrap textarea{flex:1;border:none;background:transparent;color:var(--text-1);font-size:14px;font-family:inherit;resize:none;outline:none;max-height:120px;min-height:22px;line-height:1.5;padding:8px 0}
     .input-wrap textarea::placeholder{color:var(--text-3)}
     .inp-btn{width:34px;height:34px;border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
@@ -266,7 +273,7 @@
 </head>
 <body>
 
-<div class="ambient"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="ambient"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="orb o4"></div></div>
 
 <div class="app">
   <!-- SIDEBAR -->
@@ -455,6 +462,9 @@ async function send() {
   S.messages.push({ role: 'user', content: text });
   msgInput.value = ''; msgInput.style.height = 'auto'; updateSend();
 
+  // CLIENT-SIDE INTENT DETECTION (runs before API call, as fallback)
+  const detectedAction = detectIntent(text);
+
   S.processing = true; updateSend();
   showTyping();
 
@@ -469,8 +479,14 @@ async function send() {
     const reply = data.choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
     removeTyping();
 
-    // Parse actions from response
-    const { cleanText, action } = parseAction(reply);
+    // Parse actions from AI response
+    let { cleanText, action } = parseAction(reply);
+
+    // FALLBACK: If AI didn't produce an action tag, use client-side detection
+    if (!action && detectedAction) {
+      action = detectedAction;
+    }
+
     addMsg('siri', cleanText, action);
     S.messages.push({ role: 'assistant', content: cleanText });
 
@@ -482,7 +498,13 @@ async function send() {
 
   } catch (err) {
     removeTyping();
-    addMsg('siri', "I'm having trouble connecting. Please try again.");
+    // Even on error, try to execute detected action
+    if (detectedAction) {
+      addMsg('siri', "I'll take care of that for you! ✨");
+      executeAction(detectedAction);
+    } else {
+      addMsg('siri', "I'm having trouble connecting. Please try again.");
+    }
     console.error(err);
   } finally {
     S.processing = false; updateSend(); msgInput.focus();
@@ -490,7 +512,137 @@ async function send() {
 }
 
 // ============================
-// ACTION PARSER
+// CLIENT-SIDE INTENT DETECTION (fallback if AI doesn't produce action tags)
+// ============================
+function detectIntent(userText) {
+  const t = userText.toLowerCase().trim();
+
+  // Timer patterns
+  const timerMatch = t.match(/(?:set|start|create)?\s*(?:a\s+)?(\d+)\s*(second|sec|minute|min|hour|hr)s?\s*(?:timer|countdown|focus|break)/i)
+    || t.match(/(?:timer|countdown|focus|break)\s*(?:for|of)?\s*(\d+)\s*(second|sec|minute|min|hour|hr)s?/i)
+    || t.match(/(\d+)\s*(second|sec|minute|min|hour|hr)s?\s*(?:timer|countdown|focus|break)/i);
+  if (timerMatch) {
+    let secs = parseInt(timerMatch[1]);
+    const unit = timerMatch[2].toLowerCase();
+    if (unit.startsWith('min')) secs *= 60;
+    else if (unit.startsWith('hour') || unit.startsWith('hr')) secs *= 3600;
+    const label = t.includes('focus') ? 'Focus Session' : t.includes('break') ? 'Break' : t.includes('pomodoro') ? 'Pomodoro' : 'Timer';
+    return { type: 'TIMER', raw: secs + ':' + label, parts: [String(secs), label] };
+  }
+
+  // Pomodoro
+  if (t.includes('pomodoro') || t.match(/pomo\s*doro/)) {
+    const mins = (t.match(/(\d+)/) || [,25])[1];
+    return { type: 'POMODORO', raw: mins, parts: [mins] };
+  }
+
+  // Stopwatch
+  if (t.match(/(?:start|open|show)\s*(?:a\s+)?stopwatch/) || t === 'stopwatch') {
+    return { type: 'STOPWATCH', raw: 'start', parts: ['start'] };
+  }
+
+  // Calculator
+  const calcMatch = t.match(/(?:calculat|compute|what(?:'s| is)|solve|math)\s*[:=]?\s*(.+)/i) || t.match(/^[\d\s+\-*/().%^]+$/);
+  if (calcMatch && calcMatch[1]) {
+    let expr = calcMatch[1]
+      .replace(/plus/gi, '+').replace(/minus/gi, '-').replace(/times|multiplied by|x/gi, '*')
+      .replace(/divided by|over/gi, '/').replace(/power|to the/gi, '**').replace(/percent of/gi, '/100*')
+      .replace(/[^0-9+\-*/.() %]/g, '').trim();
+    if (expr) return { type: 'CALC', raw: expr, parts: [expr] };
+  }
+
+  // Notes
+  const noteMatch = t.match(/(?:create|make|new|add|save)\s*(?:a\s+)?note\s*(?:called|titled|named)?\s*["']?([^"']+?)["']?\s*(?:with|about|:)?\s*(.*)/i);
+  if (noteMatch) {
+    return { type: 'NOTE', raw: (noteMatch[1].trim() || 'Untitled') + '|' + (noteMatch[2] || ''), parts: [noteMatch[1].trim() || 'Untitled', noteMatch[2] || ''] };
+  }
+
+  // Reminders
+  const remMatch = t.match(/(?:remind me to|reminder[:\s]+|remember to|don't forget to|add reminder[:\s]+)(.+)/i);
+  if (remMatch) {
+    return { type: 'REMINDER', raw: remMatch[1].trim(), parts: [remMatch[1].trim()] };
+  }
+
+  // Ambient sounds
+  const soundMatch = t.match(/(?:play|start|turn on)\s*(?:some\s+)?(rain|ocean|forest|cafe|coffee|fireplace|white\s*noise|ambient)/i);
+  if (soundMatch) {
+    let snd = soundMatch[1].toLowerCase();
+    if (snd.includes('coffee') || snd.includes('cafe')) snd = 'cafe';
+    if (snd.includes('white')) snd = 'whitenoise';
+    return { type: 'SOUND', raw: snd, parts: [snd] };
+  }
+  if (t.match(/(?:stop|pause|turn off)\s*(?:the\s+)?(?:sound|music|ambient|noise)/i)) {
+    return { type: 'SOUND', raw: 'stop', parts: ['stop'] };
+  }
+
+  // Weather
+  const weatherMatch = t.match(/(?:weather|temperature|forecast)\s*(?:in|for|at)\s+(.+)/i);
+  if (weatherMatch) {
+    return { type: 'WEATHER', raw: weatherMatch[1].trim(), parts: [weatherMatch[1].trim()] };
+  }
+
+  // Time
+  const timeMatch = t.match(/(?:what(?:'s| is) the )?time\s*(?:in|at|for)\s+(.+)/i) || t.match(/(?:clock|time)\s*(?:in)\s+(.+)/i);
+  if (timeMatch) {
+    const city = timeMatch[1].trim().toLowerCase();
+    const tzMap = {
+      'tokyo': 'Asia/Tokyo', 'london': 'Europe/London', 'new york': 'America/New_York',
+      'nyc': 'America/New_York', 'paris': 'Europe/Paris', 'sydney': 'Australia/Sydney',
+      'dubai': 'Asia/Dubai', 'mumbai': 'Asia/Kolkata', 'delhi': 'Asia/Kolkata',
+      'beijing': 'Asia/Shanghai', 'shanghai': 'Asia/Shanghai', 'singapore': 'Asia/Singapore',
+      'los angeles': 'America/Los_Angeles', 'la': 'America/Los_Angeles',
+      'chicago': 'America/Chicago', 'toronto': 'America/Toronto',
+      'berlin': 'Europe/Berlin', 'rome': 'Europe/Rome', 'moscow': 'Europe/Moscow',
+      'kolkata': 'Asia/Kolkata', 'bangalore': 'Asia/Kolkata', 'seoul': 'Asia/Seoul',
+      'bangkok': 'Asia/Bangkok', 'jakarta': 'Asia/Jakarta', 'cairo': 'Africa/Cairo',
+      'san francisco': 'America/Los_Angeles', 'sf': 'America/Los_Angeles'
+    };
+    const tz = tzMap[city] || city;
+    return { type: 'TIME', raw: tz, parts: [tz] };
+  }
+  if (t.match(/(?:what(?:'s| is) the )?(?:current )?(?:time|date|day)/i)) {
+    return { type: 'TIME', raw: 'local', parts: ['local'] };
+  }
+
+  // Open URLs
+  const openMatch = t.match(/(?:open|go to|visit|launch)\s+(.+)/i);
+  if (openMatch) {
+    let url = openMatch[1].trim();
+    const siteMap = {
+      'youtube': 'https://youtube.com', 'google': 'https://google.com', 'twitter': 'https://twitter.com',
+      'x': 'https://x.com', 'github': 'https://github.com', 'reddit': 'https://reddit.com',
+      'gmail': 'https://mail.google.com', 'netflix': 'https://netflix.com', 'spotify': 'https://open.spotify.com',
+      'instagram': 'https://instagram.com', 'facebook': 'https://facebook.com', 'linkedin': 'https://linkedin.com',
+      'chatgpt': 'https://chat.openai.com', 'claude': 'https://claude.ai', 'wikipedia': 'https://wikipedia.org'
+    };
+    const lower = url.toLowerCase().replace(/[^a-z]/g, '');
+    if (siteMap[lower]) url = siteMap[lower];
+    else if (!url.startsWith('http')) url = 'https://' + url;
+    return { type: 'OPEN', raw: url, parts: [url] };
+  }
+
+  // Search
+  const searchMatch = t.match(/(?:search|google|look up|find|search for)\s+(?:the web for|the internet for|for)?\s*(.+)/i);
+  if (searchMatch && !t.match(/weather|time|calculat/)) {
+    return { type: 'SEARCH', raw: searchMatch[1].trim(), parts: [searchMatch[1].trim()] };
+  }
+
+  // Theme
+  if (t.match(/(?:toggle|switch|change)\s*(?:to\s*)?(?:dark|light)\s*(?:mode|theme)?/i) || t.match(/dark mode|light mode/i)) {
+    return { type: 'THEME', raw: 'toggle', parts: ['toggle'] };
+  }
+
+  // Convert
+  const convMatch = t.match(/(?:convert|change)\s+([\d.]+)\s*(\w+)\s+(?:to|in|into)\s+(\w+)/i);
+  if (convMatch) {
+    return { type: 'CONVERT', raw: [convMatch[1], convMatch[2], convMatch[3]].join('|'), parts: [convMatch[1], convMatch[2], convMatch[3]] };
+  }
+
+  return null;
+}
+
+// ============================
+// ACTION PARSER (from AI response)
 // ============================
 function parseAction(text) {
   const match = text.match(/\[ACTION:(\w+):([^\]]*)\]/);
@@ -1182,5 +1334,3 @@ if ('Notification' in window && Notification.permission === 'default') {
 </script>
 </body>
 </html>
-
-package-lock.j
