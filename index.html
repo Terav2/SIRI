@@ -17,10 +17,8 @@
 }
 html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased}
 
-/* App */
 .app{display:flex;flex-direction:column;height:100dvh;max-width:760px;margin:0 auto;position:relative}
 
-/* Ambient glow */
 .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .ambient .g{position:absolute;border-radius:50%;filter:blur(120px);opacity:.18;animation:drift 25s ease-in-out infinite}
 .ambient .g1{width:500px;height:500px;background:var(--purple);top:-200px;left:50%;transform:translateX(-50%)}
@@ -28,22 +26,18 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 .ambient .g3{width:350px;height:350px;background:var(--pink);bottom:-100px;right:-100px;animation-delay:-18s}
 @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.1)}66%{transform:translate(-30px,40px) scale(.9)}}
 
-/* Header */
 .header{display:flex;align-items:center;justify-content:center;padding:14px 20px;position:relative;z-index:10}
 .header-title{font-size:15px;font-weight:600;color:var(--t2);letter-spacing:-.2px}
 
-/* Chat */
 .chat{flex:1;overflow-y:auto;padding:0 20px 20px;position:relative;z-index:5;scroll-behavior:smooth}
 .chat::-webkit-scrollbar{width:3px}.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:9px}
 
-/* Welcome */
 .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:16px;padding:20px}
-.orb-wrap{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center}
-#orbCanvas{border-radius:50%;filter:drop-shadow(0 0 30px rgba(191,90,242,.35)) drop-shadow(0 0 60px rgba(10,132,255,.15))}
+.orb-wrap{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center}
+#orbCanvas{border-radius:50%;filter:drop-shadow(0 0 40px rgba(191,90,242,.4)) drop-shadow(0 0 80px rgba(10,132,255,.2))}
 .welcome h1{font-size:26px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.55));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .welcome p{font-size:14px;color:var(--t2);max-width:360px;line-height:1.5}
 
-/* Messages */
 .msg{margin-bottom:14px;animation:msgIn .4s cubic-bezier(.4,0,.2,1)}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .msg-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
@@ -66,13 +60,11 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 .msg-actions button{font-size:11px;padding:3px 9px;border-radius:7px;border:1px solid var(--border);background:var(--glass);color:var(--t3);cursor:pointer;transition:all .2s}
 .msg-actions button:hover{color:var(--t1);background:var(--glass2)}
 
-/* Typing */
 .typing{display:flex;gap:4px;padding:13px 17px;border-radius:20px;background:var(--glass);border:1px solid var(--border);width:fit-content;border-bottom-left-radius:5px}
 .typing span{width:6px;height:6px;border-radius:50%;animation:bounce 1.4s ease-in-out infinite}
 .typing span:nth-child(1){background:var(--purple)}.typing span:nth-child(2){background:var(--blue);animation-delay:.2s}.typing span:nth-child(3){background:var(--pink);animation-delay:.4s}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
 
-/* Action widgets in chat */
 .widget{margin-top:10px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--border);overflow:hidden;max-width:360px;backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 4px 20px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.04)}
 .widget-head{display:flex;align-items:center;gap:7px;padding:9px 13px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;font-weight:600;color:var(--t2)}
 .widget-body{padding:14px}
@@ -100,7 +92,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 .sound-stop{padding:7px 16px;border-radius:16px;border:none;background:var(--pink);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
 .weather-c{text-align:center}.weather-ic{font-size:44px}.weather-tmp{font-size:34px;font-weight:800}.weather-city{font-size:13px;color:var(--t2)}.weather-dsc{font-size:11px;color:var(--t3);text-transform:capitalize}
 
-/* Input */
 .input-area{padding:10px 16px 22px;position:relative;z-index:10}
 .input-wrap{display:flex;align-items:flex-end;gap:6px;background:var(--glass2);border:1px solid var(--border);border-radius:26px;padding:4px 4px 4px 16px;transition:all .3s;backdrop-filter:blur(30px) saturate(150%);-webkit-backdrop-filter:blur(30px) saturate(150%);box-shadow:0 2px 16px rgba(0,0,0,.1),inset 0 1px 0 rgba(255,255,255,.04)}
 .input-wrap:focus-within{border-color:rgba(191,90,242,.3);box-shadow:0 2px 16px rgba(0,0,0,.1),0 0 0 3px rgba(191,90,242,.06)}
@@ -114,7 +105,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 .send.on{opacity:1;pointer-events:auto}.send.on:hover{transform:scale(1.05)}.send.on:active{transform:scale(.95)}
 .foot{text-align:center;font-size:10px;color:var(--t3);margin-top:6px}
 
-/* Voice overlay */
 .voverlay{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:200;gap:24px}
 .voverlay.on{display:flex}
 .vviz{display:flex;align-items:center;gap:4px;height:60px}
@@ -125,7 +115,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 .voverlay p{font-size:13px;color:var(--t2)}
 .vcancel{padding:11px 28px;border-radius:22px;border:1px solid var(--border);background:var(--glass);color:var(--t1);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}
 
-/* Small orb for header area when chat has messages */
 .orb-mini{width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--teal),var(--purple) 40%,var(--pink) 70%,var(--blue));box-shadow:0 0 12px rgba(191,90,242,.3),0 0 24px rgba(10,132,255,.12);animation:mini-breathe 4s ease-in-out infinite}
 @keyframes mini-breathe{0%,100%{transform:scale(1);box-shadow:0 0 12px rgba(191,90,242,.3)}50%{transform:scale(1.06);box-shadow:0 0 18px rgba(191,90,242,.45)}}
 
@@ -141,7 +130,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
   </div>
   <div class="chat" id="chat">
     <div class="welcome" id="welcome">
-      <div class="orb-wrap"><canvas id="orbCanvas" width="140" height="140"></canvas></div>
+      <div class="orb-wrap"><canvas id="orbCanvas" width="160" height="160"></canvas></div>
       <h1>What can I help with?</h1>
       <p>Ask me anything. I can set timers, take notes, play ambient sounds, do calculations, and more — just ask naturally.</p>
     </div>
@@ -164,78 +153,107 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 </div>
 
 <script>
-// ===== STATE =====
-const S={msgs:[],busy:false,rec:false,sr:null,timers:[],notes:[],rems:[],pomo:null,sw:null,actx:null,snode:null,csound:null,orbState:'idle'};
+const S={msgs:[],busy:false,rec:false,sr:null,timers:[],notes:[],rems:[],pomo:null,sw:null,actx:null,snode:null,csound:null,orbState:'idle',analyser:null,dataArray:null};
 try{S.notes=JSON.parse(localStorage.getItem('siri_notes')||'[]');S.rems=JSON.parse(localStorage.getItem('siri_reminders')||'[]');}catch(e){}
 
 const $=id=>document.getElementById(id);
 const chat=$('chat'),welcome=$('welcome'),inp=$('inp'),sendBtn=$('sendBtn'),voiceBtn=$('voiceBtn');
 const voverlay=$('voverlay'),vtrans=$('vtrans');
 
-// ===== ORB ANIMATION (Canvas) =====
+// ===== ORB ANIMATION (Enhanced Liquid) =====
 const canvas=$('orbCanvas');
 if(canvas){
   const ctx=canvas.getContext('2d');
-  const W=140,H=140,cx=W/2,cy=H/2;
+  const W=160,H=160,cx=W/2,cy=H/2;
   let t=0,orbIntensity=0.5;
+  let audioLevel=0;
 
   function drawOrb(){
-    t+=0.02;
+    t+=0.018;
     ctx.clearRect(0,0,W,H);
 
-    // Breathing scale
-    const breathe=Math.sin(t*0.8)*0.04;
-    const baseR=48+breathe*10;
-    const intensity=S.orbState==='listening'?0.9:S.orbState==='thinking'?0.7:0.5;
-    orbIntensity+=(intensity-orbIntensity)*0.05;
+    // Audio reactivity
+    if(S.analyser&&S.orbState==='listening'){
+      S.analyser.getByteFrequencyData(S.dataArray);
+      const avg=S.dataArray.reduce((a,b)=>a+b,0)/S.dataArray.length;
+      audioLevel+=(avg/255-audioLevel)*0.3;
+    }else{
+      audioLevel*=0.9;
+    }
 
-    // Outer glow
-    const glowR=baseR+20+Math.sin(t*1.2)*8;
+    const breathe=Math.sin(t*0.8)*0.05;
+    const baseR=52+breathe*12+audioLevel*15;
+    const intensity=S.orbState==='listening'?0.95:S.orbState==='thinking'?0.75:0.55;
+    orbIntensity+=(intensity-orbIntensity)*0.04;
+
+    // Outer glow (larger, softer)
+    const glowR=baseR+35+Math.sin(t*1.2)*10+audioLevel*20;
     const grd0=ctx.createRadialGradient(cx,cy,baseR*0.5,cx,cy,glowR);
-    grd0.addColorStop(0,'rgba(191,90,242,'+0.15*orbIntensity+')');
-    grd0.addColorStop(0.5,'rgba(10,132,255,'+0.08*orbIntensity+')');
+    grd0.addColorStop(0,'rgba(191,90,242,'+0.18*orbIntensity+')');
+    grd0.addColorStop(0.4,'rgba(10,132,255,'+0.12*orbIntensity+')');
+    grd0.addColorStop(0.7,'rgba(255,55,95,'+0.06*orbIntensity+')');
     grd0.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=grd0;ctx.fillRect(0,0,W,H);
 
-    // Main sphere
-    const grd=ctx.createRadialGradient(cx-baseR*0.25,cy-baseR*0.3,baseR*0.1,cx,cy,baseR);
-    const hue1=(Math.sin(t*0.3)*30+200);
-    const hue2=(Math.sin(t*0.5+1)*40+280);
-    const hue3=(Math.sin(t*0.4+2)*30+340);
-    grd.addColorStop(0,`hsla(${hue1},90%,75%,0.95)`);
-    grd.addColorStop(0.35,`hsla(${hue2},80%,60%,0.85)`);
-    grd.addColorStop(0.65,`hsla(${hue3},75%,50%,0.75)`);
-    grd.addColorStop(1,`hsla(210,80%,40%,0.6)`);
+    // Main sphere (liquid gradient)
+    const grd=ctx.createRadialGradient(cx-baseR*0.3,cy-baseR*0.35,baseR*0.05,cx,cy,baseR);
+    const hue1=(Math.sin(t*0.25)*35+195);
+    const hue2=(Math.sin(t*0.4+1.2)*45+275);
+    const hue3=(Math.sin(t*0.35+2.4)*35+335);
+    const hue4=(Math.sin(t*0.3+3.6)*30+160);
+    grd.addColorStop(0,`hsla(${hue1},92%,78%,0.97)`);
+    grd.addColorStop(0.3,`hsla(${hue2},82%,62%,0.88)`);
+    grd.addColorStop(0.6,`hsla(${hue3},78%,52%,0.78)`);
+    grd.addColorStop(0.85,`hsla(${hue4},75%,45%,0.65)`);
+    grd.addColorStop(1,`hsla(210,80%,38%,0.5)`);
     ctx.beginPath();ctx.arc(cx,cy,baseR,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
 
-    // Inner highlight
-    const hlGrd=ctx.createRadialGradient(cx-baseR*0.3,cy-baseR*0.35,0,cx-baseR*0.2,cy-baseR*0.25,baseR*0.6);
-    hlGrd.addColorStop(0,'rgba(255,255,255,0.35)');
-    hlGrd.addColorStop(0.5,'rgba(255,255,255,0.05)');
-    hlGrd.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.arc(cx,cy,baseR,0,Math.PI*2);ctx.fillStyle=hlGrd;ctx.fill();
-
-    // Morphing blobs (liquid effect)
-    for(let i=0;i<3;i++){
-      const angle=t*0.6+i*Math.PI*2/3;
-      const bx=cx+Math.cos(angle)*baseR*0.3;
-      const by=cy+Math.sin(angle)*baseR*0.3;
-      const br=baseR*0.35+Math.sin(t*2+i)*5;
+    // Liquid blobs (more organic)
+    const blobCount=5;
+    for(let i=0;i<blobCount;i++){
+      const angle=t*0.5+i*Math.PI*2/blobCount;
+      const dist=baseR*0.4+Math.sin(t*1.5+i*0.7)*baseR*0.15;
+      const bx=cx+Math.cos(angle)*dist;
+      const by=cy+Math.sin(angle)*dist;
+      const br=baseR*0.4+Math.sin(t*2.2+i*1.3)*8+audioLevel*10;
       const bGrd=ctx.createRadialGradient(bx,by,0,bx,by,br);
-      const bHue=(hue1+i*40+t*10)%360;
-      bGrd.addColorStop(0,`hsla(${bHue},85%,65%,0.3)`);
-      bGrd.addColorStop(1,`hsla(${bHue},85%,65%,0)`);
+      const bHue=(hue1+i*50+t*15)%360;
+      bGrd.addColorStop(0,`hsla(${bHue},88%,68%,${0.35+audioLevel*0.2})`);
+      bGrd.addColorStop(0.6,`hsla(${bHue},88%,68%,0.1)`);
+      bGrd.addColorStop(1,`hsla(${bHue},88%,68%,0)`);
       ctx.beginPath();ctx.arc(bx,by,br,0,Math.PI*2);ctx.fillStyle=bGrd;ctx.fill();
     }
 
-    // Listening ripples
-    if(S.orbState==='listening'){
-      for(let i=0;i<3;i++){
-        const rr=baseR+10+i*12+Math.sin(t*3+i)*4;
-        const alpha=0.15-i*0.04;
+    // Inner highlight (glass reflection)
+    const hlGrd=ctx.createRadialGradient(cx-baseR*0.35,cy-baseR*0.4,0,cx-baseR*0.25,cy-baseR*0.3,baseR*0.65);
+    hlGrd.addColorStop(0,'rgba(255,255,255,0.4)');
+    hlGrd.addColorStop(0.4,'rgba(255,255,255,0.08)');
+    hlGrd.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.arc(cx,cy,baseR,0,Math.PI*2);ctx.fillStyle=hlGrd;ctx.fill();
+
+    // Secondary highlight
+    const hl2=ctx.createRadialGradient(cx+baseR*0.2,cy+baseR*0.25,0,cx+baseR*0.15,cy+baseR*0.2,baseR*0.4);
+    hl2.addColorStop(0,'rgba(100,210,255,0.15)');
+    hl2.addColorStop(1,'rgba(100,210,255,0)');
+    ctx.beginPath();ctx.arc(cx,cy,baseR,0,Math.PI*2);ctx.fillStyle=hl2;ctx.fill();
+
+    // Listening ripples (audio-reactive)
+    if(S.orbState==='listening'||audioLevel>0.05){
+      const rippleCount=4;
+      for(let i=0;i<rippleCount;i++){
+        const rr=baseR+12+i*14+Math.sin(t*3.5+i)*5+audioLevel*20;
+        const alpha=(0.2-i*0.045)*orbIntensity+audioLevel*0.15;
         ctx.beginPath();ctx.arc(cx,cy,rr,0,Math.PI*2);
-        ctx.strokeStyle=`rgba(191,90,242,${alpha})`;ctx.lineWidth=1.5;ctx.stroke();
+        ctx.strokeStyle=`rgba(191,90,242,${alpha})`;ctx.lineWidth=2-i*0.3;ctx.stroke();
       }
+    }
+
+    // Thinking pulse
+    if(S.orbState==='thinking'){
+      const pulseR=baseR+5+Math.sin(t*4)*8;
+      const pulseA=0.15+Math.sin(t*4)*0.1;
+      ctx.beginPath();ctx.arc(cx,cy,pulseR,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(10,132,255,${pulseA})`;ctx.lineWidth=2;ctx.stroke();
     }
 
     requestAnimationFrame(drawOrb);
@@ -296,10 +314,10 @@ function detectIntent(t){
   const ti=t.match(/(?:time|clock)\s*(?:in|at|for)\s+(.+)/i);
   if(ti){const c=ti[1].trim().toLowerCase();const m={'tokyo':'Asia/Tokyo','london':'Europe/London','new york':'America/New_York','paris':'Europe/Paris','sydney':'Australia/Sydney','dubai':'Asia/Dubai','mumbai':'Asia/Kolkata','delhi':'Asia/Kolkata','beijing':'Asia/Shanghai','singapore':'Asia/Singapore','los angeles':'America/Los_Angeles','chicago':'America/Chicago','toronto':'America/Toronto','berlin':'Europe/Berlin','seoul':'Asia/Seoul','kolkata':'Asia/Kolkata'};return{type:'TIME',parts:[m[c]||c]};}
   if(t.match(/(?:what(?:'s| is) the )?(?:current )?(?:time|date)/))return{type:'TIME',parts:['local']};
-  const om=t.match(/(?:open|go to|visit)\s+(.+)/i);
+  // Only open URLs for explicit "open" commands
+  const om=t.match(/^(?:open|go to|visit|launch)\s+(.+)/i);
   if(om){let u=om[1].trim();const s={'youtube':'https://youtube.com','google':'https://google.com','twitter':'https://x.com','github':'https://github.com','reddit':'https://reddit.com','gmail':'https://mail.google.com','netflix':'https://netflix.com','spotify':'https://open.spotify.com','instagram':'https://instagram.com','chatgpt':'https://chat.openai.com'};const l=u.toLowerCase().replace(/[^a-z]/g,'');if(s[l])u=s[l];else if(!u.startsWith('http'))u='https://'+u;return{type:'OPEN',parts:[u]};}
-  const se=t.match(/(?:search|google|look up|find)\s+(?:for\s+)?(.+)/i);
-  if(se&&!t.match(/weather|time|calculat/))return{type:'SEARCH',parts:[se[1].trim()]};
+  // NO auto-search redirect - let AI answer directly
   return null;
 }
 
@@ -316,7 +334,7 @@ function execAction(a){
     case'REMINDER':mkRem(parts[0]||parts.join(' '));break;
     case'SOUND':parts[0]==='stop'?stopSound():playSound(parts[0]);break;
     case'OPEN':window.open(parts[0],'_blank');break;
-    case'SEARCH':window.open('https://google.com/search?q='+encodeURIComponent(parts[0]),'_blank');break;
+    case'SEARCH':window.open('https://duckduckgo.com/?q='+encodeURIComponent(parts[0]),'_blank');break;
     case'TIME':showTime(parts[0]||'local');break;
     case'WEATHER':showWeather(parts[0]);break;
   }
@@ -410,28 +428,68 @@ function showTime(tz){try{const t=new Date().toLocaleTimeString('en-US',{timeZon
 async function showWeather(city){try{const r=await fetch('https://wttr.in/'+encodeURIComponent(city)+'?format=j1');const d=await r.json();const c=d.current_condition?.[0];if(!c)throw 0;const code=parseInt(c.weatherCode);let ic='🌤️';if(code<=113)ic='☀️';else if(code<=179)ic='⛅';else if(code<=299)ic='🌧️';else if(code<=499)ic='🌨️';else ic='☁️';
   appendWidget(`<div class="widget"><div class="widget-head">🌤️ Weather</div><div class="widget-body"><div class="weather-c"><div class="weather-ic">${ic}</div><div class="weather-tmp">${c.temp_C}°C</div><div class="weather-city">${esc(city)}</div><div class="weather-dsc">${esc(c.weatherDesc?.[0]?.value||'')}</div></div></div></div>`);}catch(e){}}
 
-// ===== VOICE =====
-function initSR(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){voiceBtn.style.display='none';return;}S.sr=new SR();S.sr.continuous=true;S.sr.interimResults=true;S.sr.lang='en-US';
+// ===== VOICE (with audio visualization) =====
+function initSR(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){voiceBtn.style.display='none';return;}
+  S.sr=new SR();S.sr.continuous=true;S.sr.interimResults=true;S.sr.lang='en-US';
+  
+  // Setup audio analyser for visualization
+  if(!S.actx)S.actx=new(window.AudioContext||window.webkitAudioContext)();
+  S.analyser=S.actx.createAnalyser();
+  S.analyser.fftSize=256;
+  S.dataArray=new Uint8Array(S.analyser.frequencyBinCount);
+  
   S.sr.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;vtrans.textContent=t||'Speak now';if(e.results[e.results.length-1].isFinal){stopRec();inp.value=t;updateSend();send();}};
-  S.sr.onerror=()=>stopRec();S.sr.onend=()=>{if(S.rec)stopRec()};}
-function startRec(){if(!S.sr)return;S.rec=true;voiceBtn.classList.add('rec');voverlay.classList.add('on');vtrans.textContent='Speak now';S.orbState='listening';try{S.sr.start();}catch(e){stopRec();}}
-function stopRec(){S.rec=false;voiceBtn.classList.remove('rec');voverlay.classList.remove('on');S.orbState='idle';if(S.sr)try{S.sr.stop();}catch(e){}}
-voiceBtn.addEventListener('click',()=>S.rec?stopRec():startRec());
-$('vcancel').addEventListener('click',stopRec);initSR();
+  S.sr.onerror=()=>stopRec();
+  S.sr.onend=()=>{if(S.rec)stopRec()};
+}
 
-// ===== TTS (Better Voice Selection) =====
+function startRec(){
+  if(!S.sr)return;
+  S.rec=true;voiceBtn.classList.add('rec');voverlay.classList.add('on');
+  vtrans.textContent='Speak now';S.orbState='listening';
+  
+  // Connect microphone to analyser
+  if(S.actx&&S.analyser){
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+      const source=S.actx.createMediaStreamSource(stream);
+      source.connect(S.analyser);
+      S.micStream=stream;
+    }).catch(e=>console.log('Mic access denied'));
+  }
+  
+  try{S.sr.start();}catch(e){stopRec();}
+}
+
+function stopRec(){
+  S.rec=false;voiceBtn.classList.remove('rec');voverlay.classList.remove('on');
+  S.orbState='idle';
+  if(S.micStream){S.micStream.getTracks().forEach(t=>t.stop());S.micStream=null;}
+  if(S.sr)try{S.sr.stop();}catch(e){}
+}
+
+voiceBtn.addEventListener('click',()=>S.rec?stopRec():startRec());
+$('vcancel').addEventListener('click',stopRec);
+initSR();
+
+// ===== TTS (Improved Voice Selection) =====
 let bestVoice=null;
 function pickVoice(){
   const voices=speechSynthesis.getVoices();
-  // Prefer: Siri voices > Samantha > natural female voices
-  const prefs=['Samantha','Karen','Victoria','Moira','Tessa','Fiona','Susan','Google US English','Microsoft Zira'];
-  for(const p of prefs){const v=voices.find(v=>v.name.includes(p));if(v){bestVoice=v;return;}}
-  // Fallback: any English female
-  const en=voices.filter(v=>v.lang.startsWith('en')&&v.name.toLowerCase().includes('female'));
-  if(en.length){bestVoice=en[0];return;}
-  // Fallback: any English
-  const any=voices.filter(v=>v.lang.startsWith('en'));
-  if(any.length)bestVoice=any[0];
+  // Prefer natural-sounding voices
+  const prefs=[
+    'Samantha','Karen','Victoria','Moira','Tessa','Fiona','Susan',
+    'Google US English','Microsoft Zira','Microsoft Hazel','Microsoft Heera',
+    'Alex','Daniel','Fred'
+  ];
+  for(const p of prefs){
+    const v=voices.find(v=>v.name.includes(p));
+    if(v){bestVoice=v;return;}
+  }
+  // Fallback: any English voice
+  const en=voices.filter(v=>v.lang.startsWith('en'));
+  if(en.length)bestVoice=en[0];
 }
 speechSynthesis.addEventListener('voiceschanged',pickVoice);
 pickVoice();
@@ -442,7 +500,7 @@ function speak(text){
   const clean=text.replace(/[*#`\[\]]/g,'').replace(/\[ACTION:[^\]]*\]/g,'');
   const u=new SpeechSynthesisUtterance(clean);
   if(bestVoice)u.voice=bestVoice;
-  u.rate=1.05;u.pitch=1.05;u.volume=1;
+  u.rate=0.95;u.pitch=1.0;u.volume=1;
   speechSynthesis.speak(u);
 }
 
@@ -456,7 +514,6 @@ function addMsg(role,content){
     const a=document.createElement('div');a.className='msg-actions';
     a.innerHTML=`<button onclick="cpTxt(this)" data-t="${escA(content)}">📋 Copy</button><button onclick="spkTxt(this)" data-t="${escA(content)}">🔊 Read</button>`;
     d.querySelector('.msg-bubble').after(a);
-    // Auto-speak
     speak(content);
   }
   chat.appendChild(d);scrollB();
