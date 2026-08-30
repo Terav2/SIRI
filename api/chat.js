@@ -1,5 +1,3 @@
-Diff
-
 export const config = {
   runtime: 'nodejs'
 };
