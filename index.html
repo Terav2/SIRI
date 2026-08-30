@@ -41,7 +41,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
 /* Welcome */
 .welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;gap:18px;padding:20px}
 .orb-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.orb-wrap canvas{border-radius:999px;filter:drop-shadow(0 0 35px rgba(191,90,242,.45)) drop-shadow(0 0 70px rgba(10,132,255,.2)) drop-shadow(0 0 20px rgba(255,55,95,.15))}
+.orb-wrap canvas{filter:drop-shadow(0 0 35px rgba(191,90,242,.45)) drop-shadow(0 0 70px rgba(10,132,255,.2)) drop-shadow(0 0 20px rgba(255,55,95,.15))}
 .welcome h1{font-size:26px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#fff,rgba(255,255,255,.55));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .welcome p{font-size:14px;color:var(--t2);max-width:380px;line-height:1.5}
 
@@ -171,7 +171,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',-apple-system,BlinkMac
   </div>
   <div class="chat" id="chat">
     <div class="welcome" id="welcome">
-      <div class="orb-wrap"><canvas id="siriOrb" width="220" height="90"></canvas></div>
+      <div class="orb-wrap"><canvas id="siriOrb" width="300" height="140"></canvas></div>
       <h1>What can I help with?</h1>
       <p>Ask me anything. I can set timers, take notes, play sounds, do calculations, check weather, and much more.</p>
     </div>
@@ -224,114 +224,178 @@ const $=id=>document.getElementById(id);
 const chat=$('chat'),welcome=$('welcome'),inp=$('inp'),sendBtn=$('sendBtn'),voiceBtn=$('voiceBtn');
 const voverlay=$('voverlay'),vtrans=$('vtrans');
 
-// ===== SIRI PILL ORB ANIMATION (Dynamic Island style) =====
+// ===== SIRI DYNAMIC ISLAND: Circle → Pill Morph =====
 function animateSiriOrb(){
   const canvas=$('siriOrb');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
-  const rX=W/2-10; // horizontal radius (wide)
-  const rY=H/2-10; // vertical radius (short)
+  
+  // Shape dimensions
+  const circleSize=70; // idle: circle diameter
+  const pillW=220;     // active: pill width
+  const pillH=70;      // pill height (same as circle)
+  
   let t=0;
+  let currentW=circleSize;
+  let currentH=circleSize;
+  let targetW=circleSize;
+  let targetH=circleSize;
+
+  function drawPill(x,y,w,h,r){
+    // Draw a proper pill (rounded rect with radius = h/2)
+    // This gives straight top/bottom edges with semicircular ends
+    r=Math.min(r,h/2,w/2);
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.arc(x+w-r,y+r,r,-Math.PI/2,Math.PI/2);
+    ctx.lineTo(x+r,y+h);
+    ctx.arc(x+r,y+r,r,Math.PI/2,-Math.PI/2);
+    ctx.closePath();
+  }
 
   function draw(){
     t+=0.018;
     ctx.clearRect(0,0,W,H);
-    const intensity=S.orbState==='listening'?0.95:S.orbState==='thinking'?0.75:0.55;
-    const breathe=Math.sin(t*0.7)*0.03;
-    const arX=rX+breathe*8+Math.sin(t*1.3)*3;
-    const arY=rY+breathe*4+Math.cos(t*1.1)*2;
+
+    // Determine target shape
+    const isActive=S.orbState==='listening'||S.orbState==='thinking';
+    if(isActive){
+      targetW=pillW; // expand to pill
+      targetH=pillH;
+    }else{
+      targetW=circleSize; // shrink to circle
+      targetH=circleSize;
+    }
+
+    // Smooth morph
+    const speed=0.07;
+    currentW+=(targetW-currentW)*speed;
+    currentH+=(targetH-currentH)*speed;
+
+    const w=currentW;
+    const h=currentH;
+    const x=cx-w/2;
+    const y=cy-h/2;
+    const radius=h/2; // pill radius = half height
+
+    const intensity=isActive?0.92:0.5;
+    const breathe=Math.sin(t*0.7)*2;
+    const bw=w+breathe;
+    const bh=h+breathe*0.5;
+    const bx=cx-bw/2;
+    const by=cy-bh/2;
+    const br=bh/2;
 
     // Outer glow
-    const glowRX=arX+25;const glowRY=arY+25;
-    const g0=ctx.createRadialGradient(cx,cy,Math.min(arX,arY)*0.3,cx,cy,Math.max(glowRX,glowRY));
-    g0.addColorStop(0,`rgba(191,90,242,${0.22*intensity})`);
-    g0.addColorStop(0.4,`rgba(10,132,255,${0.12*intensity})`);
-    g0.addColorStop(0.7,`rgba(255,55,95,${0.06*intensity})`);
+    const glowSize=Math.max(bw,bh)+30;
+    const g0=ctx.createRadialGradient(cx,cy,Math.min(bw,bh)*0.2,cx,cy,glowSize/2);
+    g0.addColorStop(0,`rgba(191,90,242,${0.25*intensity})`);
+    g0.addColorStop(0.35,`rgba(10,132,255,${0.14*intensity})`);
+    g0.addColorStop(0.65,`rgba(255,55,95,${0.06*intensity})`);
     g0.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=g0;ctx.fillRect(0,0,W,H);
 
-    // Main pill shape
+    // Colors
     const h1=(Math.sin(t*0.25)*35+195);
     const h2=(Math.sin(t*0.4+1.2)*45+275);
     const h3=(Math.sin(t*0.35+2.4)*35+335);
     const h4=(Math.sin(t*0.3+3.6)*30+160);
 
-    const grd=ctx.createRadialGradient(cx-arX*0.4,cy-arY*0.4,arY*0.1,cx,cy,arX);
+    // Main shape gradient
+    const grd=ctx.createRadialGradient(cx-bw*0.25,cy-bh*0.35,bh*0.1,cx,cy,bw*0.55);
     grd.addColorStop(0,`hsla(${h1},92%,80%,0.97)`);
-    grd.addColorStop(0.25,`hsla(${h2},85%,65%,0.9)`);
-    grd.addColorStop(0.55,`hsla(${h3},80%,55%,0.82)`);
-    grd.addColorStop(0.8,`hsla(${h4},75%,45%,0.7)`);
-    grd.addColorStop(1,`hsla(210,80%,35%,0.5)`);
+    grd.addColorStop(0.25,`hsla(${h2},85%,65%,0.92)`);
+    grd.addColorStop(0.55,`hsla(${h3},80%,55%,0.85)`);
+    grd.addColorStop(0.8,`hsla(${h4},75%,45%,0.72)`);
+    grd.addColorStop(1,`hsla(210,80%,35%,0.55)`);
 
-    ctx.beginPath();ctx.ellipse(cx,cy,arX,arY,0,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();
+    // Draw main pill/circle
+    drawPill(bx,by,bw,bh,br);
+    ctx.fillStyle=grd;
+    ctx.fill();
 
-    // Liquid blobs moving inside the pill
+    // Liquid blobs (clipped to shape)
     ctx.save();
-    ctx.beginPath();ctx.ellipse(cx,cy,arX,arY,0,0,Math.PI*2);ctx.clip();
-    for(let i=0;i<5;i++){
-      const angle=t*0.4+i*Math.PI*2/5;
-      const dist=arX*0.5+Math.sin(t*1.2+i*0.8)*arX*0.15;
-      const bx=cx+Math.cos(angle)*dist;
-      const by=cy+Math.sin(angle*1.3)*arY*0.4;
-      const br=arY*0.7+Math.sin(t*2+i*1.3)*8;
-      const bg=ctx.createRadialGradient(bx,by,0,bx,by,br);
-      const bh=(h1+i*45+t*12)%360;
-      bg.addColorStop(0,`hsla(${bh},90%,70%,0.4)`);
-      bg.addColorStop(0.6,`hsla(${bh},90%,70%,0.1)`);
-      bg.addColorStop(1,`hsla(${bh},90%,70%,0)`);
-      ctx.beginPath();ctx.arc(bx,by,br,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
+    drawPill(bx,by,bw,bh,br);
+    ctx.clip();
+
+    for(let i=0;i<6;i++){
+      const angle=t*0.4+i*Math.PI*2/6;
+      const dist=bw*0.3+Math.sin(t*1.2+i*0.8)*bw*0.1;
+      const blobX=cx+Math.cos(angle)*dist;
+      const blobY=cy+Math.sin(angle*1.3)*bh*0.25;
+      const blobR=bh*0.5+Math.sin(t*2+i*1.3)*6;
+      const bg=ctx.createRadialGradient(blobX,blobY,0,blobX,blobY,blobR);
+      const bHue=(h1+i*40+t*12)%360;
+      bg.addColorStop(0,`hsla(${bHue},90%,70%,0.4)`);
+      bg.addColorStop(0.5,`hsla(${bHue},90%,70%,0.12)`);
+      bg.addColorStop(1,`hsla(${bHue},90%,70%,0)`);
+      ctx.beginPath();ctx.arc(blobX,blobY,blobR,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
     }
 
-    // Swirling inner light
+    // Swirling light streaks
     for(let i=0;i<3;i++){
-      const sa=t*0.6+i*Math.PI*2/3;
-      const sx=cx+Math.cos(sa)*arX*0.35;
-      const sy=cy+Math.sin(sa*0.7)*arY*0.25;
-      const sr=arY*0.5+Math.sin(t*1.8+i)*5;
+      const sa=t*0.5+i*Math.PI*2/3;
+      const sx=cx+Math.cos(sa)*bw*0.25;
+      const sy=cy+Math.sin(sa*0.8)*bh*0.2;
+      const sr=bh*0.4+Math.sin(t*1.5+i)*4;
       const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,sr);
-      const sh=(h2+i*60+t*8)%360;
-      sg.addColorStop(0,`hsla(${sh},95%,75%,0.25)`);
-      sg.addColorStop(1,`hsla(${sh},95%,75%,0)`);
+      const sh=(h2+i*55+t*10)%360;
+      sg.addColorStop(0,`hsla(${sh},95%,78%,0.28)`);
+      sg.addColorStop(1,`hsla(${sh},95%,78%,0)`);
       ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
     }
 
     // Glass highlight (top)
-    const hl=ctx.createRadialGradient(cx-arX*0.25,cy-arY*0.5,0,cx-arX*0.15,cy-arY*0.3,arX*0.5);
-    hl.addColorStop(0,'rgba(255,255,255,0.4)');
-    hl.addColorStop(0.4,'rgba(255,255,255,0.08)');
+    const hl=ctx.createRadialGradient(cx-bw*0.15,cy-bh*0.4,0,cx-bw*0.08,cy-bh*0.2,bw*0.35);
+    hl.addColorStop(0,'rgba(255,255,255,0.38)');
+    hl.addColorStop(0.35,'rgba(255,255,255,0.1)');
     hl.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.ellipse(cx-arX*0.1,cy-arY*0.15,arX*0.55,arY*0.5,0,0,Math.PI*2);ctx.fillStyle=hl;ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx-bw*0.05,cy-bh*0.15,bw*0.35,bh*0.35,0,0,Math.PI*2);ctx.fillStyle=hl;ctx.fill();
 
-    // Secondary highlight (bottom right)
-    const hl2=ctx.createRadialGradient(cx+arX*0.3,cy+arY*0.2,0,cx+arX*0.2,cy+arY*0.15,arY*0.5);
-    hl2.addColorStop(0,'rgba(100,210,255,0.18)');
+    // Bottom highlight
+    const hl2=ctx.createRadialGradient(cx+bw*0.2,cy+bh*0.15,0,cx+bw*0.12,cy+bh*0.1,bh*0.3);
+    hl2.addColorStop(0,'rgba(100,210,255,0.15)');
     hl2.addColorStop(1,'rgba(100,210,255,0)');
-    ctx.beginPath();ctx.ellipse(cx+arX*0.25,cy+arY*0.15,arX*0.3,arY*0.35,-0.3,0,Math.PI*2);ctx.fillStyle=hl2;ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+bw*0.15,cy+bh*0.1,bw*0.2,bh*0.25,-0.2,0,Math.PI*2);ctx.fillStyle=hl2;ctx.fill();
 
     ctx.restore();
 
-    // Edge glow (thin border glow like real Siri)
-    ctx.beginPath();ctx.ellipse(cx,cy,arX,arY,0,0,Math.PI*2);
-    ctx.strokeStyle=`rgba(191,90,242,${0.15+Math.sin(t*1.5)*0.08})`;
-    ctx.lineWidth=1.5;ctx.stroke();
+    // Edge glow (thin luminous border)
+    drawPill(bx,by,bw,bh,br);
+    ctx.strokeStyle=`rgba(191,90,242,${0.1+Math.sin(t*1.5)*0.05})`;
+    ctx.lineWidth=1.5;
+    ctx.stroke();
 
-    // Listening ripples
+    // Listening: expanding ripples from the pill
     if(S.orbState==='listening'){
       for(let i=0;i<3;i++){
-        const rpx=arX+8+i*10+Math.sin(t*3+i)*4;
-        const rpy=arY+6+i*7+Math.sin(t*3+i)*3;
-        const alpha=0.18-i*0.05;
-        ctx.beginPath();ctx.ellipse(cx,cy,rpx,rpy,0,0,Math.PI*2);
-        ctx.strokeStyle=`rgba(191,90,242,${alpha})`;ctx.lineWidth=1.5-i*0.3;ctx.stroke();
+        const phase=(t*2+i*0.8)%3;
+        const expand=phase/3;
+        const rw=bw/2+expand*25;
+        const rh=bh/2+expand*18;
+        const alpha=(1-expand)*0.22;
+        ctx.save();
+        drawPill(cx-rw,cy-rh,rw*2,rh*2,rh);
+        ctx.strokeStyle=`rgba(191,90,242,${alpha})`;
+        ctx.lineWidth=2-expand*1.2;
+        ctx.stroke();
+        ctx.restore();
       }
     }
 
-    // Thinking pulse
+    // Thinking: pulsing glow
     if(S.orbState==='thinking'){
-      const pa=0.12+Math.sin(t*4)*0.08;
-      ctx.beginPath();ctx.ellipse(cx,cy,arX+6+Math.sin(t*4)*5,arY+4+Math.sin(t*4)*3,0,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(10,132,255,${pa})`;ctx.lineWidth=2;ctx.stroke();
+      const pa=0.08+Math.sin(t*4)*0.06;
+      const pulse=1+Math.sin(t*3)*0.025;
+      ctx.save();
+      drawPill(cx-bw*pulse/2-3,cy-bh*pulse/2-2,bw*pulse+6,bh*pulse+4,(bh*pulse+4)/2);
+      ctx.strokeStyle=`rgba(10,132,255,${pa})`;
+      ctx.lineWidth=2;
+      ctx.stroke();
+      ctx.restore();
     }
 
     requestAnimationFrame(draw);
