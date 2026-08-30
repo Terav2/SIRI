@@ -410,31 +410,50 @@ inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDef
 sendBtn.addEventListener('click',send);
 function updateSend(){sendBtn.classList.toggle('on',inp.value.trim().length>0&&!S.busy)}
 
+// ===== API CALL =====
+async function callAI(messages){
+  const res=await fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages})
+  });
+  if(!res.ok){
+    const err=await res.text().catch(()=>'');
+    throw new Error('API error: '+res.status+' '+err);
+  }
+  return res.json();
+}
+
 // ===== SEND =====
 async function send(){
   const text=inp.value.trim();if(!text||S.busy)return;
-  if(welcome)welcome.style.display='none';
+  if(welcome){welcome.style.display='none';}
   addMsg('user',text);S.msgs.push({role:'user',content:text});
   inp.value='';inp.style.height='auto';updateSend();
   const detected=detectIntent(text);
   S.busy=true;updateSend();showTyping();
   S.orbState='thinking';
   try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:S.msgs})});
-    if(!res.ok)throw new Error('API');
-    const data=await res.json();
+    const data=await callAI(S.msgs);
     const reply=data.choices?.[0]?.message?.content||"I couldn't respond. Please try again.";
     removeTyping();
     let{clean,action}=parseAction(reply);
     if(!action&&detected)action=detected;
     addMsg('siri',clean);S.msgs.push({role:'assistant',content:clean});
     if(action)execAction(action);
-    // Save to history
     saveHistory(text, clean);
   }catch(err){
     removeTyping();
     if(detected){addMsg('siri',"I'll take care of that! ✨");execAction(detected);}
-    else addMsg('siri',"I'm having trouble connecting. Please try again.");
+    else{
+      const errMsg=err.message||'';
+      if(errMsg.includes('500')||errMsg.includes('API key')){
+        addMsg('siri',"⚠️ The AI service isn't configured yet. Please add **OPENROUTER_API_KEY** as an environment variable in your Vercel project settings, then redeploy. You can get a free key at openrouter.ai");
+      }else{
+        addMsg('siri',"I'm having trouble connecting right now. Please check your internet connection and try again.");
+      }
+    }
+    console.error('API error:',err);
   }finally{S.busy=false;updateSend();inp.focus();S.orbState='idle';}
 }
 
@@ -556,21 +575,42 @@ async function showWeather(city){try{const r=await fetch('https://wttr.in/'+enco
 function initSR(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){voiceBtn.style.display='none';return;}S.sr=new SR();S.sr.continuous=true;S.sr.interimResults=true;S.sr.lang='en-US';
   if(!S.actx)S.actx=new(window.AudioContext||window.webkitAudioContext)();
   S.analyser=S.actx.createAnalyser();S.analyser.fftSize=256;S.dataArray=new Uint8Array(S.analyser.frequencyBinCount);
-  S.sr.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;vtrans.textContent=t||'Speak now';updateListeningText(t);if(e.results[e.results.length-1].isFinal){stopRec();inp.value=t;updateSend();send();}};
+  S.sr.onresult=e=>{let t='';for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;vtrans.textContent=t||'Speak now';updateOrbTranscript(t);if(e.results[e.results.length-1].isFinal){stopRec();inp.value=t;updateSend();send();}};
   S.sr.onerror=()=>stopRec();S.sr.onend=()=>{if(S.rec)stopRec()};}
 
-function startRec(){if(!S.sr)return;S.rec=true;voiceBtn.classList.add('rec');voverlay.classList.add('on');vtrans.textContent='Speak now';S.orbState='listening';
-  // Show listening indicator in chat
-  if(welcome)welcome.style.display='none';
-  showListeningIndicator();
-  // Connect mic
+function startRec(){if(!S.sr)return;S.rec=true;voiceBtn.classList.add('rec');vtrans.textContent='Speak now';S.orbState='listening';
+  // Don't hide welcome — let the orb expand like Dynamic Island!
+  // Show transcript below the orb
+  showOrbTranscript();
+  // Connect mic for audio visualization
   if(S.actx&&S.analyser){navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{const source=S.actx.createMediaStreamSource(stream);source.connect(S.analyser);S.micStream=stream;}).catch(()=>{});}
   try{S.sr.start();}catch(e){stopRec();}}
 
-function stopRec(){S.rec=false;voiceBtn.classList.remove('rec');voverlay.classList.remove('on');S.orbState='idle';
-  hideListeningIndicator();
+function stopRec(){S.rec=false;voiceBtn.classList.remove('rec');S.orbState='idle';
+  hideOrbTranscript();
   if(S.micStream){S.micStream.getTracks().forEach(t=>t.stop());S.micStream=null;}
   if(S.sr)try{S.sr.stop();}catch(e){}}
+
+// Transcript shown below the orb when listening
+function showOrbTranscript(){
+  let el=document.getElementById('orbTranscript');
+  if(!el){
+    el=document.createElement('div');el.id='orbTranscript';
+    el.style.cssText='text-align:center;font-size:14px;color:var(--t2);margin-top:8px;min-height:22px;animation:msgIn .3s';
+    const orbWrap=document.querySelector('.orb-wrap');
+    if(orbWrap)orbWrap.parentNode.insertBefore(el,orbWrap.nextSibling);
+  }
+  el.textContent='Listening...';
+  el.style.display='block';
+}
+function hideOrbTranscript(){
+  const el=document.getElementById('orbTranscript');
+  if(el)el.style.display='none';
+}
+function updateOrbTranscript(text){
+  const el=document.getElementById('orbTranscript');
+  if(el&&text)el.textContent='"'+text+'"';
+}
 
 function showListeningIndicator(){
   if(document.getElementById('listeningInd'))return;
