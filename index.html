@@ -224,27 +224,28 @@ const $=id=>document.getElementById(id);
 const chat=$('chat'),welcome=$('welcome'),inp=$('inp'),sendBtn=$('sendBtn'),voiceBtn=$('voiceBtn');
 const voverlay=$('voverlay'),vtrans=$('vtrans');
 
-// ===== SIRI DYNAMIC ISLAND: Circle → Pill Morph =====
+// ===== ULTIMATE LIQUID DYNAMIC ISLAND ANIMATION =====
 function animateSiriOrb(){
   const canvas=$('siriOrb');
   if(!canvas)return;
   const ctx=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
-  
-  // Shape dimensions
-  const circleSize=70; // idle: circle diameter
-  const pillW=220;     // active: pill width
-  const pillH=70;      // pill height (same as circle)
-  
+  const circleSize=70,pillW=220,pillH=70;
   let t=0;
-  let currentW=circleSize;
-  let currentH=circleSize;
-  let targetW=circleSize;
-  let targetH=circleSize;
+  let currentW=circleSize,currentH=circleSize;
+  let targetW=circleSize,targetH=circleSize;
+  let audioLevel=0;
+
+  // Simplex-like noise function for organic movement
+  function noise(x,y,z){
+    const p=x*12.9898+y*78.233+z*45.164;
+    return (Math.sin(p)*43758.5453)%1;
+  }
+  function smoothNoise(x,y,z){
+    return Math.sin(x*1.7+z*0.3)*0.3+Math.sin(y*2.3+z*0.5)*0.3+Math.sin((x+y)*1.1+z*0.7)*0.2+Math.sin(x*3.1-y*1.9+z*0.2)*0.2;
+  }
 
   function drawPill(x,y,w,h,r){
-    // Draw a proper pill (rounded rect with radius = h/2)
-    // This gives straight top/bottom edges with semicircular ends
     r=Math.min(r,h/2,w/2);
     ctx.beginPath();
     ctx.moveTo(x+r,y);
@@ -256,146 +257,187 @@ function animateSiriOrb(){
   }
 
   function draw(){
-    t+=0.018;
+    t+=0.016;
     ctx.clearRect(0,0,W,H);
 
-    // Determine target shape
+    // Audio reactivity
+    if(S.analyser&&S.dataArray&&S.orbState==='listening'){
+      S.analyser.getByteFrequencyData(S.dataArray);
+      const avg=S.dataArray.reduce((a,b)=>a+b,0)/S.dataArray.length;
+      audioLevel+=(avg/255-audioLevel)*0.3;
+    }else{audioLevel*=0.92;}
+
     const isActive=S.orbState==='listening'||S.orbState==='thinking';
-    if(isActive){
-      targetW=pillW; // expand to pill
-      targetH=pillH;
-    }else{
-      targetW=circleSize; // shrink to circle
-      targetH=circleSize;
+    targetW=isActive?pillW:circleSize;
+    targetH=isActive?pillH:circleSize;
+
+    // Spring physics for smooth morph
+    const springK=0.08;const damping=0.85;
+    currentW+=(targetW-currentW)*springK;
+    currentH+=(targetH-currentH)*springK;
+
+    const w=currentW;const h=currentH;
+    const breathe=Math.sin(t*0.6)*2+audioLevel*8;
+    const bw=w+breathe;const bh=h+breathe*0.4;
+    const bx=cx-bw/2;const by=cy-bh/2;const br=bh/2;
+    const intensity=isActive?0.95:0.55;
+    const energy=isActive?1+audioLevel*0.5:0.6;
+
+    // === LAYER 1: Deep outer glow (3 layers) ===
+    for(let g=0;g<3;g++){
+      const glowScale=1+g*0.3;
+      const gSize=Math.max(bw,bh)*glowScale+20;
+      const g0=ctx.createRadialGradient(cx,cy,Math.min(bw,bh)*0.15,cx,cy,gSize/2);
+      const alpha=(0.2-g*0.05)*intensity;
+      const colors=[
+        [`rgba(191,90,242,${alpha})`,`rgba(10,132,255,${alpha*0.6})`,`rgba(255,55,95,${alpha*0.3})`,'rgba(0,0,0,0)'],
+        [`rgba(100,210,255,${alpha*0.7})`,`rgba(191,90,242,${alpha*0.4})`,`rgba(10,132,255,${alpha*0.2})`,'rgba(0,0,0,0)'],
+        [`rgba(255,55,95,${alpha*0.5})`,`rgba(255,159,10,${alpha*0.3})`,`rgba(191,90,242,${alpha*0.15})`,'rgba(0,0,0,0)']
+      ];
+      const c=colors[g];
+      g0.addColorStop(0,c[0]);g0.addColorStop(0.35,c[1]);g0.addColorStop(0.65,c[2]);g0.addColorStop(1,c[3]);
+      ctx.fillStyle=g0;ctx.fillRect(0,0,W,H);
     }
 
-    // Smooth morph
-    const speed=0.07;
-    currentW+=(targetW-currentW)*speed;
-    currentH+=(targetH-currentH)*speed;
+    // === LAYER 2: Base color palette (shifting hues) ===
+    const h1=(Math.sin(t*0.2)*40+195);
+    const h2=(Math.sin(t*0.3+1.2)*50+275);
+    const h3=(Math.sin(t*0.25+2.4)*40+335);
+    const h4=(Math.sin(t*0.22+3.6)*35+160);
+    const h5=(Math.sin(t*0.28+4.8)*30+45);
 
-    const w=currentW;
-    const h=currentH;
-    const x=cx-w/2;
-    const y=cy-h/2;
-    const radius=h/2; // pill radius = half height
-
-    const intensity=isActive?0.92:0.5;
-    const breathe=Math.sin(t*0.7)*2;
-    const bw=w+breathe;
-    const bh=h+breathe*0.5;
-    const bx=cx-bw/2;
-    const by=cy-bh/2;
-    const br=bh/2;
-
-    // Outer glow
-    const glowSize=Math.max(bw,bh)+30;
-    const g0=ctx.createRadialGradient(cx,cy,Math.min(bw,bh)*0.2,cx,cy,glowSize/2);
-    g0.addColorStop(0,`rgba(191,90,242,${0.25*intensity})`);
-    g0.addColorStop(0.35,`rgba(10,132,255,${0.14*intensity})`);
-    g0.addColorStop(0.65,`rgba(255,55,95,${0.06*intensity})`);
-    g0.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle=g0;ctx.fillRect(0,0,W,H);
-
-    // Colors
-    const h1=(Math.sin(t*0.25)*35+195);
-    const h2=(Math.sin(t*0.4+1.2)*45+275);
-    const h3=(Math.sin(t*0.35+2.4)*35+335);
-    const h4=(Math.sin(t*0.3+3.6)*30+160);
-
-    // Main shape gradient
-    const grd=ctx.createRadialGradient(cx-bw*0.25,cy-bh*0.35,bh*0.1,cx,cy,bw*0.55);
-    grd.addColorStop(0,`hsla(${h1},92%,80%,0.97)`);
-    grd.addColorStop(0.25,`hsla(${h2},85%,65%,0.92)`);
-    grd.addColorStop(0.55,`hsla(${h3},80%,55%,0.85)`);
-    grd.addColorStop(0.8,`hsla(${h4},75%,45%,0.72)`);
-    grd.addColorStop(1,`hsla(210,80%,35%,0.55)`);
-
-    // Draw main pill/circle
+    // === LAYER 3: Main shape with rich gradient ===
+    const grd=ctx.createRadialGradient(cx-bw*0.3,cy-bh*0.4,bh*0.05,cx+bw*0.1,cy+bh*0.1,bw*0.6);
+    grd.addColorStop(0,`hsla(${h1},95%,82%,0.98)`);
+    grd.addColorStop(0.2,`hsla(${h2},88%,68%,0.94)`);
+    grd.addColorStop(0.45,`hsla(${h3},82%,58%,0.88)`);
+    grd.addColorStop(0.7,`hsla(${h4},78%,48%,0.78)`);
+    grd.addColorStop(0.9,`hsla(${h5},70%,40%,0.65)`);
+    grd.addColorStop(1,`hsla(220,75%,32%,0.5)`);
     drawPill(bx,by,bw,bh,br);
-    ctx.fillStyle=grd;
-    ctx.fill();
+    ctx.fillStyle=grd;ctx.fill();
 
-    // Liquid blobs (clipped to shape)
+    // === LAYER 4: Liquid blobs (10 organic metaball-like blobs) ===
     ctx.save();
-    drawPill(bx,by,bw,bh,br);
-    ctx.clip();
+    drawPill(bx,by,bw,bh,br);ctx.clip();
 
-    for(let i=0;i<6;i++){
-      const angle=t*0.4+i*Math.PI*2/6;
-      const dist=bw*0.3+Math.sin(t*1.2+i*0.8)*bw*0.1;
-      const blobX=cx+Math.cos(angle)*dist;
-      const blobY=cy+Math.sin(angle*1.3)*bh*0.25;
-      const blobR=bh*0.5+Math.sin(t*2+i*1.3)*6;
+    for(let i=0;i<10;i++){
+      const phase=t*0.35+i*Math.PI*2/10;
+      const n1=smoothNoise(i*0.7,t*0.4,i*1.3);
+      const n2=smoothNoise(i*1.1,t*0.3+5,i*0.9);
+      const distX=bw*0.35*(0.5+n1*0.5);
+      const distY=bh*0.3*(0.5+n2*0.5);
+      const blobX=cx+Math.cos(phase)*distX+Math.sin(t*0.8+i)*bw*0.08;
+      const blobY=cy+Math.sin(phase*1.3)*distY+Math.cos(t*0.6+i)*bh*0.06;
+      const blobR=bh*(0.35+Math.sin(t*1.5+i*1.7)*0.12)+audioLevel*bh*0.15;
       const bg=ctx.createRadialGradient(blobX,blobY,0,blobX,blobY,blobR);
-      const bHue=(h1+i*40+t*12)%360;
-      bg.addColorStop(0,`hsla(${bHue},90%,70%,0.4)`);
-      bg.addColorStop(0.5,`hsla(${bHue},90%,70%,0.12)`);
-      bg.addColorStop(1,`hsla(${bHue},90%,70%,0)`);
+      const bHue=(h1+i*36+t*10+n1*30)%360;
+      const bAlpha=0.35+energy*0.1+audioLevel*0.15;
+      bg.addColorStop(0,`hsla(${bHue},92%,72%,${bAlpha})`);
+      bg.addColorStop(0.4,`hsla(${(bHue+20)%360},88%,65%,${bAlpha*0.4})`);
+      bg.addColorStop(0.7,`hsla(${(bHue+40)%360},85%,58%,${bAlpha*0.1})`);
+      bg.addColorStop(1,`hsla(${bHue},85%,58%,0)`);
       ctx.beginPath();ctx.arc(blobX,blobY,blobR,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
     }
 
-    // Swirling light streaks
-    for(let i=0;i<3;i++){
-      const sa=t*0.5+i*Math.PI*2/3;
-      const sx=cx+Math.cos(sa)*bw*0.25;
-      const sy=cy+Math.sin(sa*0.8)*bh*0.2;
-      const sr=bh*0.4+Math.sin(t*1.5+i)*4;
+    // === LAYER 5: Plasma energy streaks ===
+    for(let i=0;i<5;i++){
+      const sa=t*0.4+i*Math.PI*2/5;
+      const sn=smoothNoise(i*2,t*0.5,i*0.5);
+      const sx=cx+Math.cos(sa+sn*0.5)*bw*0.3;
+      const sy=cy+Math.sin(sa*0.8+sn*0.3)*bh*0.22;
+      const sr=bh*(0.3+Math.sin(t*1.2+i*2)*0.08)+audioLevel*bh*0.1;
       const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,sr);
-      const sh=(h2+i*55+t*10)%360;
-      sg.addColorStop(0,`hsla(${sh},95%,78%,0.28)`);
-      sg.addColorStop(1,`hsla(${sh},95%,78%,0)`);
+      const sh=(h2+i*72+t*8)%360;
+      sg.addColorStop(0,`hsla(${sh},98%,80%,${0.25*energy})`);
+      sg.addColorStop(0.5,`hsla(${(sh+30)%360},95%,70%,${0.08*energy})`);
+      sg.addColorStop(1,`hsla(${sh},95%,70%,0)`);
       ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
     }
 
-    // Glass highlight (top)
-    const hl=ctx.createRadialGradient(cx-bw*0.15,cy-bh*0.4,0,cx-bw*0.08,cy-bh*0.2,bw*0.35);
-    hl.addColorStop(0,'rgba(255,255,255,0.38)');
-    hl.addColorStop(0.35,'rgba(255,255,255,0.1)');
-    hl.addColorStop(1,'rgba(255,255,255,0)');
-    ctx.beginPath();ctx.ellipse(cx-bw*0.05,cy-bh*0.15,bw*0.35,bh*0.35,0,0,Math.PI*2);ctx.fillStyle=hl;ctx.fill();
+    // === LAYER 6: Internal fluid currents ===
+    for(let i=0;i<4;i++){
+      ctx.beginPath();
+      const startY=cy-bh*0.3+i*bh*0.2;
+      ctx.moveTo(bx+br,startY);
+      for(let x=0;x<=bw-br*2;x+=4){
+        const wave=Math.sin(x*0.04+t*2+i*1.5)*bh*0.08+smoothNoise(x*0.01,i,t*0.5)*bh*0.05;
+        ctx.lineTo(bx+br+x,startY+wave);
+      }
+      const cHue=(h1+i*90+t*15)%360;
+      ctx.strokeStyle=`hsla(${cHue},90%,75%,${0.08*energy})`;
+      ctx.lineWidth=bh*0.08;
+      ctx.lineCap='round';
+      ctx.stroke();
+    }
 
-    // Bottom highlight
-    const hl2=ctx.createRadialGradient(cx+bw*0.2,cy+bh*0.15,0,cx+bw*0.12,cy+bh*0.1,bh*0.3);
-    hl2.addColorStop(0,'rgba(100,210,255,0.15)');
+    // === LAYER 7: Glass highlight (top) ===
+    const hl=ctx.createRadialGradient(cx-bw*0.18,cy-bh*0.45,0,cx-bw*0.1,cy-bh*0.22,bw*0.38);
+    hl.addColorStop(0,'rgba(255,255,255,0.42)');
+    hl.addColorStop(0.25,'rgba(255,255,255,0.15)');
+    hl.addColorStop(0.5,'rgba(255,255,255,0.04)');
+    hl.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.beginPath();ctx.ellipse(cx-bw*0.06,cy-bh*0.18,bw*0.38,bh*0.38,0,0,Math.PI*2);ctx.fillStyle=hl;ctx.fill();
+
+    // === LAYER 8: Secondary highlight (bottom-right) ===
+    const hl2=ctx.createRadialGradient(cx+bw*0.22,cy+bh*0.18,0,cx+bw*0.15,cy+bh*0.12,bh*0.35);
+    hl2.addColorStop(0,`rgba(100,210,255,${0.18*energy})`);
     hl2.addColorStop(1,'rgba(100,210,255,0)');
-    ctx.beginPath();ctx.ellipse(cx+bw*0.15,cy+bh*0.1,bw*0.2,bh*0.25,-0.2,0,Math.PI*2);ctx.fillStyle=hl2;ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx+bw*0.18,cy+bh*0.12,bw*0.22,bh*0.28,-0.2,0,Math.PI*2);ctx.fillStyle=hl2;ctx.fill();
+
+    // === LAYER 9: Specular highlights (tiny bright spots) ===
+    for(let i=0;i<3;i++){
+      const spX=cx-bw*0.2+i*bw*0.15+Math.sin(t*0.5+i)*bw*0.05;
+      const spY=cy-bh*0.3+Math.cos(t*0.7+i)*bh*0.05;
+      const spR=2+Math.sin(t*2+i)*1;
+      const spG=ctx.createRadialGradient(spX,spY,0,spX,spY,spR*3);
+      spG.addColorStop(0,'rgba(255,255,255,0.6)');
+      spG.addColorStop(0.3,'rgba(255,255,255,0.15)');
+      spG.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.beginPath();ctx.arc(spX,spY,spR*3,0,Math.PI*2);ctx.fillStyle=spG;ctx.fill();
+    }
 
     ctx.restore();
 
-    // Edge glow (thin luminous border)
+    // === LAYER 10: Edge glow (luminous border) ===
     drawPill(bx,by,bw,bh,br);
-    ctx.strokeStyle=`rgba(191,90,242,${0.1+Math.sin(t*1.5)*0.05})`;
-    ctx.lineWidth=1.5;
-    ctx.stroke();
+    const edgeAlpha=0.12+Math.sin(t*1.5)*0.04+audioLevel*0.1;
+    ctx.strokeStyle=`rgba(191,90,242,${edgeAlpha})`;
+    ctx.lineWidth=1.5;ctx.stroke();
 
-    // Listening: expanding ripples from the pill
+    // === LAYER 11: Chromatic aberration edge ===
+    drawPill(bx-1,by,bw+2,bh,br);
+    ctx.strokeStyle=`rgba(10,132,255,${0.04+audioLevel*0.04})`;ctx.lineWidth=0.8;ctx.stroke();
+    drawPill(bx+1,by,bw-2,bh,br);
+    ctx.strokeStyle=`rgba(255,55,95,${0.03+audioLevel*0.03})`;ctx.lineWidth=0.8;ctx.stroke();
+
+    // === LAYER 12: Listening ripples (expanding pill ripples) ===
     if(S.orbState==='listening'){
-      for(let i=0;i<3;i++){
-        const phase=(t*2+i*0.8)%3;
-        const expand=phase/3;
-        const rw=bw/2+expand*25;
-        const rh=bh/2+expand*18;
-        const alpha=(1-expand)*0.22;
+      for(let i=0;i<4;i++){
+        const phase=(t*1.8+i*0.7)%3.5;
+        const expand=phase/3.5;
+        const rw=bw/2+expand*30+audioLevel*15;
+        const rh=bh/2+expand*20+audioLevel*10;
+        const alpha=(1-expand)*0.25;
         ctx.save();
         drawPill(cx-rw,cy-rh,rw*2,rh*2,rh);
         ctx.strokeStyle=`rgba(191,90,242,${alpha})`;
-        ctx.lineWidth=2-expand*1.2;
-        ctx.stroke();
+        ctx.lineWidth=2.5-expand*1.5;ctx.stroke();
         ctx.restore();
       }
     }
 
-    // Thinking: pulsing glow
+    // === LAYER 13: Thinking pulse ===
     if(S.orbState==='thinking'){
-      const pa=0.08+Math.sin(t*4)*0.06;
-      const pulse=1+Math.sin(t*3)*0.025;
-      ctx.save();
-      drawPill(cx-bw*pulse/2-3,cy-bh*pulse/2-2,bw*pulse+6,bh*pulse+4,(bh*pulse+4)/2);
-      ctx.strokeStyle=`rgba(10,132,255,${pa})`;
-      ctx.lineWidth=2;
-      ctx.stroke();
-      ctx.restore();
+      for(let i=0;i<2;i++){
+        const pa=0.1+Math.sin(t*3.5+i*Math.PI)*0.07;
+        const pulse=1+Math.sin(t*2.5+i)*0.025;
+        ctx.save();
+        drawPill(cx-bw*pulse/2-3-i*4,cy-bh*pulse/2-2-i*3,bw*pulse+6+i*8,bh*pulse+4+i*6,(bh*pulse+4+i*6)/2);
+        ctx.strokeStyle=i===0?`rgba(10,132,255,${pa})`:`rgba(191,90,242,${pa*0.6})`;
+        ctx.lineWidth=2-i*0.5;ctx.stroke();
+        ctx.restore();
+      }
     }
 
     requestAnimationFrame(draw);
@@ -660,11 +702,88 @@ function animateListeningOrb(){
 voiceBtn.addEventListener('click',()=>S.rec?stopRec():startRec());
 $('vcancel').addEventListener('click',stopRec);initSR();
 
-// ===== TTS =====
+// ===== ENHANCED TTS (Natural Voice System) =====
 let bestVoice=null;
-function pickVoice(){const voices=speechSynthesis.getVoices();const prefs=['Samantha','Karen','Victoria','Moira','Tessa','Fiona','Susan','Google US English','Microsoft Zira','Alex','Daniel'];for(const p of prefs){const v=voices.find(v=>v.name.includes(p));if(v){bestVoice=v;return;}}const en=voices.filter(v=>v.lang.startsWith('en'));if(en.length)bestVoice=en[0];}
-speechSynthesis.addEventListener('voiceschanged',pickVoice);pickVoice();
-function speak(text){if(!('speechSynthesis'in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text.replace(/[*#`\[\]]/g,'').replace(/\[ACTION:[^\]]*\]/g,''));if(bestVoice)u.voice=bestVoice;u.rate=0.95;u.pitch=1.0;u.volume=1;speechSynthesis.speak(u);}
+let allVoices=[];
+
+function pickVoice(){
+  allVoices=speechSynthesis.getVoices();
+  // Priority: Neural > Enhanced > Premium > Natural > default
+  const neuralPrefs=[
+    'Microsoft Jenny','Microsoft Aria','Microsoft Guy','Microsoft Sara',
+    'Microsoft Nancy','Microsoft Jane','Microsoft Jason','Microsoft Davis',
+    'Google US English','Google UK English Female','Google UK English Male',
+    'Samantha Enhanced','Samantha','Karen','Victoria','Moira','Tessa','Fiona',
+    'Susan','Alex','Daniel','Fred','Rishi','Serena',
+    'Microsoft Zira','Microsoft Hazel','Microsoft Heera',
+    'Aria','Jenny','Guy','Sara','Nancy','Jane','Jason','Davis'
+  ];
+  // Try to find neural/enhanced voices first
+  for(const p of neuralPrefs){
+    const v=allVoices.find(v=>v.name.includes(p));
+    if(v){bestVoice=v;return;}
+  }
+  // Fallback: any English female voice
+  const enFemale=allVoices.filter(v=>v.lang.startsWith('en')&&v.name.toLowerCase().match(/female|woman|zira|sara|jenny|aria|samantha|karen|victoria|susan/));
+  if(enFemale.length){bestVoice=enFemale[0];return;}
+  // Fallback: any English voice
+  const en=allVoices.filter(v=>v.lang.startsWith('en'));
+  if(en.length)bestVoice=en[0];
+}
+speechSynthesis.addEventListener('voiceschanged',pickVoice);
+pickVoice();
+
+// Speak with natural pacing and prosody
+function speak(text){
+  if(!('speechSynthesis'in window))return;
+  speechSynthesis.cancel();
+  
+  // Clean text
+  const clean=text.replace(/[*#`\[\]]/g,'').replace(/\[ACTION:[^\]]*\]/g,'').replace(/\n+/g,'. ').trim();
+  if(!clean)return;
+
+  // Split into sentences for natural pacing
+  const sentences=clean.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[clean];
+  
+  let delay=0;
+  sentences.forEach((sentence,i)=>{
+    const s=sentence.trim();
+    if(!s)return;
+    
+    setTimeout(()=>{
+      const u=new SpeechSynthesisUtterance(s);
+      if(bestVoice)u.voice=bestVoice;
+      
+      // Natural rate: slightly slower = more natural
+      u.rate=0.92;
+      
+      // Pitch variation based on sentence type
+      if(s.endsWith('?')){
+        u.pitch=1.08; // Questions: slightly higher
+        u.rate=0.94;
+      }else if(s.endsWith('!')){
+        u.pitch=1.05; // Exclamations: slightly higher
+        u.rate=0.96;
+      }else{
+        u.pitch=0.98; // Statements: slightly lower = warmer
+      }
+      
+      u.volume=1;
+      
+      // Last sentence: slightly slower for closure
+      if(i===sentences.length-1){
+        u.rate*=0.9;
+      }
+      
+      speechSynthesis.speak(u);
+    },delay);
+    
+    // Calculate delay: ~150ms per word + punctuation pause
+    const words=s.split(/\s+/).length;
+    const punctPause=s.match(/[.!?]$/)?400:s.match(/[,]$/)?200:0;
+    delay+=words*140+punctPause+80;
+  });
+}
 
 // ===== CHAT HISTORY =====
 function saveHistory(userMsg, siriMsg){
