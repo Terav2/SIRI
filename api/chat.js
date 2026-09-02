@@ -132,3 +132,4 @@ export default async function handler(req, res) {
   }
 }
 
+Could not connect to the reCAPTCHA service. Please check your internet connection and reload to get a reCAPTCHA challenge.
