@@ -3,7 +3,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Clear session cookie
   res.setHeader(
     'Set-Cookie',
     'sio_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0'
