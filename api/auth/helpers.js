@@ -6,11 +6,9 @@ const redis = new Redis({
   token: process.env.Sio_KV_REST_API_TOKEN,
 });
 
-// Parse cookies from request
 function parseCookies(req) {
   const cookieHeader = req.headers.cookie;
   if (!cookieHeader) return {};
-  
   return cookieHeader.split(';').reduce((cookies, cookie) => {
     const [name, value] = cookie.trim().split('=');
     cookies[name] = decodeURIComponent(value);
@@ -21,17 +19,9 @@ function parseCookies(req) {
 export async function getUser(req) {
   const cookies = parseCookies(req);
   const sessionToken = cookies.sio_session;
-
-  if (!sessionToken) {
-    return null;
-  }
-
+  if (!sessionToken) return null;
   try {
-    const decoded = jwt.verify(
-      sessionToken,
-      process.env.JWT_SECRET || 'sio-secret-key-change-in-production'
-    );
-
+    const decoded = jwt.verify(sessionToken, process.env.JWT_SECRET || 'sio-secret');
     const user = await redis.get(`user:${decoded.email}`);
     return user;
   } catch (error) {
@@ -42,13 +32,8 @@ export async function getUser(req) {
 export async function trackUsage(userId) {
   const today = new Date().toISOString().split('T')[0];
   const usageKey = `usage:${userId}:${today}`;
-  
-  // Increment usage
   const usage = await redis.incr(usageKey);
-  
-  // Set expiry to 25 hours (to handle timezone edge cases)
-  await redis.expire(usageKey, 25 * 60 * 60);
-  
+  await redis.expire(usageKey, 90000);
   return usage;
 }
 
@@ -58,4 +43,3 @@ export async function getUsage(userId) {
   const usage = await redis.get(usageKey);
   return usage || 0;
 }
-
