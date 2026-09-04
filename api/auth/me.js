@@ -6,11 +6,9 @@ const redis = new Redis({
   token: process.env.Sio_KV_REST_API_TOKEN,
 });
 
-// Parse cookies from request
 function parseCookies(req) {
   const cookieHeader = req.headers.cookie;
   if (!cookieHeader) return {};
-  
   return cookieHeader.split(';').reduce((cookies, cookie) => {
     const [name, value] = cookie.trim().split('=');
     cookies[name] = decodeURIComponent(value);
@@ -26,25 +24,16 @@ export default async function handler(req, res) {
   try {
     const cookies = parseCookies(req);
     const sessionToken = cookies.sio_session;
-
     if (!sessionToken) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    // Verify session
-    const decoded = jwt.verify(
-      sessionToken,
-      process.env.JWT_SECRET || 'sio-secret-key-change-in-production'
-    );
-
-    // Get user from Redis
+    const decoded = jwt.verify(sessionToken, process.env.JWT_SECRET || 'sio-secret');
     const user = await redis.get(`user:${decoded.email}`);
-
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Get today's usage
     const today = new Date().toISOString().split('T')[0];
     const usageKey = `usage:${user.id}:${today}`;
     const todayUsage = await redis.get(usageKey);
@@ -58,7 +47,7 @@ export default async function handler(req, res) {
       },
       usage: {
         today: todayUsage || 0,
-        limit: 20, // Free tier limit
+        limit: 20,
         remaining: 20 - (todayUsage || 0),
       },
     });
