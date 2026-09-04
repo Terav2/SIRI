@@ -13,40 +13,29 @@ export default async function handler(req, res) {
 
   try {
     const { token } = req.query;
-
     if (!token) {
       return res.status(400).json({ error: 'Token required' });
     }
 
-    // Verify token exists in Redis
     const magicData = await redis.get(`magic:${token}`);
     if (!magicData) {
       return res.status(400).json({ error: 'Invalid or expired magic link' });
     }
 
-    // Verify JWT
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'sio-secret-key-change-in-production'
-    );
-
-    // Create session (7 days)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'sio-secret');
     const sessionToken = jwt.sign(
       { userId: decoded.userId, email: decoded.email },
-      process.env.JWT_SECRET || 'sio-secret-key-change-in-production',
+      process.env.JWT_SECRET || 'sio-secret',
       { expiresIn: '7d' }
     );
 
-    // Delete magic link token (one-time use)
     await redis.del(`magic:${token}`);
 
-    // Set session cookie
     res.setHeader(
       'Set-Cookie',
-      `sio_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+      `sio_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`
     );
 
-    // Redirect to home page
     res.redirect('/');
   } catch (error) {
     console.error('Verify error:', error);
@@ -56,4 +45,3 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
-
